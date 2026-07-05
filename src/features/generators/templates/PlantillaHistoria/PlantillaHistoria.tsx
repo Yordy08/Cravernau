@@ -15,7 +15,7 @@ const layout: FrameLayout = {
     height: 62,
     fontSize: 34,
     paddingX: 26,
-    borderRadius: '16px 0 16px 0',
+    borderRadius: '0 16px 0 16px',
   },
   headline: {
     left: 82,

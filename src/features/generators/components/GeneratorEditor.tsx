@@ -33,7 +33,7 @@ export default function GeneratorEditor({ definition }: GeneratorEditorProps) {
   const position = g.getPosition(definition.id)
 
   return (
-    <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-[380px_1fr]">
+    <div className="grid h-full grid-cols-1 gap-4 lg:grid-cols-[380px_1fr]">
       {/* Panel izquierdo */}
       <aside className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <h2 className="mb-1 text-xl font-bold text-white">{definition.name}</h2>
@@ -56,7 +56,7 @@ export default function GeneratorEditor({ definition }: GeneratorEditorProps) {
         )}
       </aside>
 
-      {/* Panel derecho */}
+      {/* Panel derecho: ocupa todo el espacio disponible */}
       <section className="min-h-[60vh] rounded-2xl border border-slate-800 bg-slate-950/60 lg:min-h-0">
         <TemplateStage
           definition={definition}

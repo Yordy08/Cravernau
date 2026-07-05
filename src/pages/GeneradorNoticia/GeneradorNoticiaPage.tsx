@@ -22,7 +22,7 @@ export function GeneratorShell({ children }: { children: ReactNode }) {
   }
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-[#070b14] text-slate-100">
-      <div className="mx-auto flex min-h-screen max-w-7xl flex-col px-6 py-8">
+      <div className="flex min-h-screen w-full flex-col px-[10px] py-6">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white">Generador de plantillas</h1>
