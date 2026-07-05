@@ -1,0 +1,35 @@
+.section{
+  padding:28px 16px 16px;
+}
+.container{
+  max-width:980px;
+  margin:0 auto;
+}
+.h2{
+  margin:0 0 18px;
+  font-size:20px;
+  color:#dbe4ff;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;
+}
+@media (max-width: 860px){
+  .grid{grid-template-columns:1fr;}
+}
+.card{
+  padding:16px;
+  border-radius:16px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+}
+.cardTitle{
+  font-weight:800;
+  margin-bottom:8px;
+}
+.cardDesc{
+  color:rgba(232,238,252,.85);
+  line-height:1.45;
+}
+
