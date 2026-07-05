@@ -15,12 +15,84 @@ interface NewsFrameTemplateProps {
   resizeMode?: boolean
   foreground?: ForegroundTransform
   onForegroundChange?: (t: ForegroundTransform) => void
+  headlineScale?: number
 }
 
 const FONT_HEADLINE =
   "'Helvetica Now Display', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif"
 
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v))
+
+// Estilos estáticos (se crean una sola vez, no en cada render).
+const FILL: CSSProperties = { position: 'absolute', inset: 0, width: '100%', height: '100%' }
+const ROOT_STYLE: CSSProperties = {
+  position: 'relative',
+  width: '100%',
+  height: '100%',
+  overflow: 'hidden',
+  background: '#000',
+}
+const BLUR_BG_STYLE: CSSProperties = {
+  ...FILL,
+  objectFit: 'cover',
+  filter: 'blur(38px)',
+  transform: 'scale(1.18)', // evita bordes transparentes del desenfoque
+  pointerEvents: 'none',
+}
+const FG_BASE_STYLE: CSSProperties = {
+  ...FILL,
+  objectFit: 'contain',
+  transformOrigin: 'center',
+  touchAction: 'none',
+  userSelect: 'none',
+}
+const COVER_BASE_STYLE: CSSProperties = {
+  ...FILL,
+  objectFit: 'cover',
+  touchAction: 'none',
+  userSelect: 'none',
+}
+const FRAME_STYLE: CSSProperties = { ...FILL, pointerEvents: 'none' }
+const PLACEHOLDER_STYLE: CSSProperties = {
+  ...FILL,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'linear-gradient(135deg,#20293b 0%,#111827 60%,#0b0f1a 100%)',
+  color: 'rgba(255,255,255,0.28)',
+  fontFamily: FONT_HEADLINE,
+  fontSize: 40,
+  letterSpacing: 2,
+  textTransform: 'uppercase',
+}
+const BADGE_BASE_STYLE: CSSProperties = {
+  position: 'absolute',
+  display: 'inline-flex',
+  alignItems: 'center',
+  boxSizing: 'border-box',
+  border: '2px solid #ffffff',
+  background: 'linear-gradient(90deg, #d0202c 0%, #c11a26 46%, #2c0510 70%, #0a0204 100%)',
+  boxShadow: '0 6px 14px rgba(0,0,0,0.45)',
+  pointerEvents: 'none',
+}
+const BADGE_TEXT_STYLE: CSSProperties = {
+  fontFamily: FONT_HEADLINE,
+  fontWeight: 800,
+  lineHeight: 1,
+  letterSpacing: 1,
+  color: '#fff',
+  textTransform: 'uppercase',
+  whiteSpace: 'nowrap',
+  textShadow: '0 2px 3px rgba(0,0,0,0.45)',
+}
+const HEADLINE_BASE_STYLE: CSSProperties = {
+  position: 'absolute',
+  margin: 0,
+  fontFamily: FONT_HEADLINE,
+  color: '#fff',
+  textShadow: '0 3px 14px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.6)',
+  pointerEvents: 'none',
+}
 
 /**
  * Renderizador genérico de plantillas de noticia basadas en un marco PNG.
@@ -45,6 +117,7 @@ export default function NewsFrameTemplate({
   resizeMode = false,
   foreground,
   onForegroundChange,
+  headlineScale = 1,
 }: NewsFrameTemplateProps) {
   const { badge, headline } = layout
   const category = data.category.trim() || 'CATEGORÍA'
@@ -147,10 +220,7 @@ export default function NewsFrameTemplate({
   }
 
   return (
-    <div
-      ref={rootRef}
-      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#000' }}
-    >
+    <div ref={rootRef} style={ROOT_STYLE}>
       {/* 1. Fotografía principal */}
       {data.imageUrl ? (
         resizeMode ? (
@@ -161,18 +231,7 @@ export default function NewsFrameTemplate({
               alt=""
               aria-hidden
               draggable={false}
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: `${pos.x}% ${pos.y}%`,
-                filter: 'blur(38px)',
-                // Escalamos para que el desenfoque no deje bordes transparentes.
-                transform: 'scale(1.18)',
-                pointerEvents: 'none',
-              }}
+              style={{ ...BLUR_BG_STYLE, objectPosition: `${pos.x}% ${pos.y}%` }}
             />
             <img
               ref={fgRef}
@@ -184,16 +243,9 @@ export default function NewsFrameTemplate({
               onPointerUp={onFgPointerUp}
               onPointerCancel={onFgPointerUp}
               style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
+                ...FG_BASE_STYLE,
                 transform: `translate(${fg.x}%, ${fg.y}%) scale(${fg.zoom})`,
-                transformOrigin: 'center',
                 cursor: onForegroundChange ? (fgDragging ? 'grabbing' : 'grab') : 'default',
-                touchAction: 'none',
-                userSelect: 'none',
               }}
             />
           </>
@@ -208,99 +260,47 @@ export default function NewsFrameTemplate({
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
             style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
+              ...COVER_BASE_STYLE,
               objectPosition: `${pos.x}% ${pos.y}%`,
               cursor: draggable ? (dragging ? 'grabbing' : 'grab') : 'default',
-              touchAction: 'none',
-              userSelect: 'none',
             }}
           />
         )
       ) : (
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg,#20293b 0%,#111827 60%,#0b0f1a 100%)',
-            color: 'rgba(255,255,255,0.28)',
-            fontFamily: FONT_HEADLINE,
-            fontSize: 40,
-            letterSpacing: 2,
-            textTransform: 'uppercase',
-          }}
-        >
-          Sube una imagen
-        </div>
+        <div style={PLACEHOLDER_STYLE}>Sube una imagen</div>
       )}
 
       {/* 2. Marco fijo */}
-      <img
-        src={layout.frameSrc}
-        alt=""
-        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-      />
+      <img src={layout.frameSrc} alt="" style={FRAME_STYLE} />
 
       {/* 3. Badge de categoría: rectángulo con esquinas opuestas redondeadas,
              gradiente rojo→negro (60/40) y borde blanco. */}
       <div
         style={{
-          position: 'absolute',
+          ...BADGE_BASE_STYLE,
           left: badge.left,
           top: badge.top,
           minWidth: badge.minWidth,
           height: badge.height,
-          display: 'inline-flex',
-          alignItems: 'center',
           paddingLeft: badge.paddingX,
           paddingRight: badge.paddingX,
-          boxSizing: 'border-box',
           borderRadius: badge.borderRadius,
-          border: '2px solid #ffffff',
-          background: 'linear-gradient(90deg, #d0202c 0%, #c11a26 46%, #2c0510 70%, #0a0204 100%)',
-          boxShadow: '0 6px 14px rgba(0,0,0,0.45)',
-          pointerEvents: 'none',
         }}
       >
-        <span
-          style={{
-            fontFamily: FONT_HEADLINE,
-            fontWeight: 800,
-            fontSize: badge.fontSize,
-            lineHeight: 1,
-            letterSpacing: 1,
-            color: '#fff',
-            textTransform: 'uppercase',
-            whiteSpace: 'nowrap',
-            textShadow: '0 2px 3px rgba(0,0,0,0.45)',
-          }}
-        >
-          {category}
-        </span>
+        <span style={{ ...BADGE_TEXT_STYLE, fontSize: badge.fontSize }}>{category}</span>
       </div>
 
       {/* 4. Titular */}
       <h1
         style={{
-          position: 'absolute',
+          ...HEADLINE_BASE_STYLE,
           left: headline.left,
           top: headline.top,
           right: headline.right,
-          margin: 0,
-          fontFamily: FONT_HEADLINE,
           fontWeight: headline.fontWeight,
-          fontSize: headline.fontSize,
-          lineHeight: `${headline.lineHeight}px`,
-          color: '#fff',
-          textShadow: '0 3px 14px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.6)',
-          pointerEvents: 'none',
-        } as CSSProperties}
+          fontSize: headline.fontSize * headlineScale,
+          lineHeight: `${headline.lineHeight * headlineScale}px`,
+        }}
       >
         {headlineText}
       </h1>

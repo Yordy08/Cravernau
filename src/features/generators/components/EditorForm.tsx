@@ -5,6 +5,8 @@ interface EditorFormProps {
   data: NewsTemplateData
   onCategoryChange: (value: string) => void
   onHeadlineChange: (value: string) => void
+  headlineScale: number
+  onHeadlineScaleChange: (scale: number) => void
   onImageChange: (file: File | null) => void
   onExport: () => void
   isExporting: boolean
@@ -24,6 +26,8 @@ export default function EditorForm({
   data,
   onCategoryChange,
   onHeadlineChange,
+  headlineScale,
+  onHeadlineScaleChange,
   onImageChange,
   onExport,
   isExporting,
@@ -73,6 +77,34 @@ export default function EditorForm({
           rows={4}
           className={`${fieldClass} resize-none`}
         />
+
+        <div className="mt-3 rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-sm font-semibold text-slate-300">Tamaño del titular</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs tabular-nums text-slate-400">
+                {Math.round(headlineScale * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={() => onHeadlineScaleChange(1)}
+                className="text-xs text-slate-400 underline-offset-2 transition hover:text-white hover:underline"
+              >
+                Restablecer
+              </button>
+            </div>
+          </div>
+          <input
+            type="range"
+            aria-label="Tamaño del titular"
+            min={0.5}
+            max={1.8}
+            step={0.01}
+            value={headlineScale}
+            onChange={(e) => onHeadlineScaleChange(Number(e.target.value))}
+            className="w-full accent-red-600"
+          />
+        </div>
       </div>
 
       <div>
@@ -133,6 +165,7 @@ export default function EditorForm({
             </div>
             <input
               type="range"
+              aria-label="Zoom de la imagen"
               min={0.5}
               max={5}
               step={0.01}

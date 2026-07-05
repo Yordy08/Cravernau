@@ -33,6 +33,7 @@ export default function GeneratorEditor({ definition }: GeneratorEditorProps) {
   const position = g.getPosition(definition.id)
   const resizeMode = g.getResizeMode(definition.id)
   const foreground = g.getTransform(definition.id)
+  const headlineScale = g.getHeadlineScale(definition.id)
 
   const { setTransform } = g
   const handleForegroundChange = useCallback(
@@ -52,6 +53,8 @@ export default function GeneratorEditor({ definition }: GeneratorEditorProps) {
           data={data}
           onCategoryChange={g.setCategory}
           onHeadlineChange={g.setHeadline}
+          headlineScale={headlineScale}
+          onHeadlineScaleChange={(s) => g.setHeadlineScale(definition.id, s)}
           onImageChange={g.setImageFile}
           onExport={exportPng}
           isExporting={isExporting}
@@ -86,6 +89,7 @@ export default function GeneratorEditor({ definition }: GeneratorEditorProps) {
           resizeMode={resizeMode}
           foreground={foreground}
           onForegroundChange={handleForegroundChange}
+          headlineScale={headlineScale}
         />
       </section>
     </div>

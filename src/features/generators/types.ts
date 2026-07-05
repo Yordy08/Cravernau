@@ -51,6 +51,8 @@ export interface TemplateComponentProps {
   foreground?: ForegroundTransform
   /** Callback al ampliar/desplazar la imagen en primer plano. */
   onForegroundChange?: (t: ForegroundTransform) => void
+  /** Escala del titular (multiplicador del tamaño base). */
+  headlineScale?: number
 }
 
 export type TemplateComponent = ComponentType<TemplateComponentProps>

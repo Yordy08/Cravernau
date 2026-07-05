@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createContext, use, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { ForegroundTransform } from '../types'
 
 export interface ImagePosition {
@@ -27,6 +27,9 @@ interface GeneratorContextValue {
   /** Zoom + desplazamiento del primer plano (modo Redimensionar), por plantilla. */
   getTransform: (templateId: string) => ForegroundTransform
   setTransform: (templateId: string, t: ForegroundTransform) => void
+  /** Escala del titular (multiplicador del tamaño base), por plantilla. */
+  getHeadlineScale: (templateId: string) => number
+  setHeadlineScale: (templateId: string, scale: number) => void
 }
 
 const DEFAULT_POSITION: ImagePosition = { x: 50, y: 50 }
@@ -43,6 +46,7 @@ interface PersistedText {
   positions?: Positions
   resizeModes?: Record<string, boolean>
   transforms?: Record<string, ForegroundTransform>
+  headlineScales?: Record<string, number>
 }
 
 function loadText(): PersistedText {
@@ -74,6 +78,9 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
   const [transforms, setTransforms] = useState<Record<string, ForegroundTransform>>(
     initialText.transforms ?? {},
   )
+  const [headlineScales, setHeadlineScales] = useState<Record<string, number>>(
+    initialText.headlineScales ?? {},
+  )
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(
     () => localStorage.getItem(IMAGE_KEY),
   )
@@ -83,12 +90,12 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(
         TEXT_KEY,
-        JSON.stringify({ category, headline, positions, resizeModes, transforms }),
+        JSON.stringify({ category, headline, positions, resizeModes, transforms, headlineScales }),
       )
     } catch {
       /* cuota llena: se mantiene en memoria */
     }
-  }, [category, headline, positions, resizeModes, transforms])
+  }, [category, headline, positions, resizeModes, transforms, headlineScales])
 
   // Persistir la imagen por separado (solo cuando cambia).
   useEffect(() => {
@@ -137,6 +144,15 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
     setTransforms((prev) => ({ ...prev, [templateId]: t }))
   }, [])
 
+  const getHeadlineScale = useCallback(
+    (templateId: string) => headlineScales[templateId] ?? 1,
+    [headlineScales],
+  )
+
+  const setHeadlineScale = useCallback((templateId: string, scale: number) => {
+    setHeadlineScales((prev) => ({ ...prev, [templateId]: scale }))
+  }, [])
+
   const value: GeneratorContextValue = {
     category,
     headline,
@@ -150,13 +166,15 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
     setResizeMode,
     getTransform,
     setTransform,
+    getHeadlineScale,
+    setHeadlineScale,
   }
 
   return <GeneratorContext.Provider value={value}>{children}</GeneratorContext.Provider>
 }
 
 export function useGenerator(): GeneratorContextValue {
-  const ctx = useContext(GeneratorContext)
+  const ctx = use(GeneratorContext)
   if (!ctx) throw new Error('useGenerator debe usarse dentro de <GeneratorProvider>')
   return ctx
 }

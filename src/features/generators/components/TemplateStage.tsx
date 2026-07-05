@@ -17,6 +17,7 @@ interface TemplateStageProps {
   resizeMode: boolean
   foreground: ForegroundTransform
   onForegroundChange: (t: ForegroundTransform) => void
+  headlineScale: number
 }
 
 /**
@@ -34,6 +35,7 @@ export default function TemplateStage({
   resizeMode,
   foreground,
   onForegroundChange,
+  headlineScale,
 }: TemplateStageProps) {
   const { size, Component } = definition
   const { containerRef, scale } = useFitScale(size)
@@ -68,6 +70,7 @@ export default function TemplateStage({
               resizeMode={resizeMode}
               foreground={foreground}
               onForegroundChange={onForegroundChange}
+              headlineScale={headlineScale}
             />
           </div>
         </div>
