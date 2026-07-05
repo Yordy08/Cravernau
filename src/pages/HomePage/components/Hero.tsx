@@ -11,7 +11,7 @@ export default function Hero() {
           Instala dependencias, ejecuta el proyecto y navega a la ruta principal.
         </p>
         <div className={styles.actions}>
-          <a className={styles.primary} href="/home">Ir a Home</a>
+          <a className={styles.primary} href="/generador/noticia">Generador de Noticias</a>
           <a className={styles.secondary} href="https://vitejs.dev" target="_blank" rel="noreferrer">
             Ver Vite
           </a>
