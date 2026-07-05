@@ -1,23 +1,27 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 import styles from './hero.module.css'
 
 export default function Hero() {
   return (
     <section className={styles.hero}>
       <div className={styles.container}>
-        <div className={styles.badge}>React + Vite</div>
-        <h1 className={styles.title}>Vista principal lista y funcional</h1>
+        <div className={styles.badge}>Cravernau · Burbuja Política</div>
+        <h1 className={styles.title}>Crea tus plantillas de noticias en segundos</h1>
         <p className={styles.subtitle}>
-          Instala dependencias, ejecuta el proyecto y navega a la ruta principal.
+          Generador de publicaciones para las redes de Burbuja Política. Elige una plantilla,
+          cambia la categoría, el titular y la imagen, reencuádrala en tiempo real y expórtala
+          en PNG de alta calidad. Sin editores complejos: solo el contenido cambia, el diseño
+          se mantiene siempre impecable.
         </p>
         <div className={styles.actions}>
-          <a className={styles.primary} href="/generador/noticia">Generador de Noticias</a>
-          <a className={styles.secondary} href="https://vitejs.dev" target="_blank" rel="noreferrer">
-            Ver Vite
-          </a>
+          <Link className={styles.primary} to="/generador/noticia">
+            Generador Noticia 4:5
+          </Link>
+          <Link className={styles.secondary} to="/generador/historia">
+            Historia 9:16
+          </Link>
         </div>
       </div>
     </section>
   )
 }
-

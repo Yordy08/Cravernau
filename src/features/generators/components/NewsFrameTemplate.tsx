@@ -1,11 +1,20 @@
-import { useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
-import type { FrameLayout, ImagePosition, NewsTemplateData } from '../types'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
+} from 'react'
+import type { ForegroundTransform, FrameLayout, ImagePosition, NewsTemplateData } from '../types'
 
 interface NewsFrameTemplateProps {
   data: NewsTemplateData
   layout: FrameLayout
   imagePosition?: ImagePosition
   onPositionChange?: (pos: ImagePosition) => void
+  resizeMode?: boolean
+  foreground?: ForegroundTransform
+  onForegroundChange?: (t: ForegroundTransform) => void
 }
 
 const FONT_HEADLINE =
@@ -25,21 +34,81 @@ const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(mi
  * Las dos plantillas (Noticia 4:5 e Historia 9:16) reutilizan este componente;
  * solo cambian el `layout` y el tamaño.
  */
+const ZOOM_MIN = 0.5
+const ZOOM_MAX = 5
+
 export default function NewsFrameTemplate({
   data,
   layout,
   imagePosition,
   onPositionChange,
+  resizeMode = false,
+  foreground,
+  onForegroundChange,
 }: NewsFrameTemplateProps) {
   const { badge, headline } = layout
   const category = data.category.trim() || 'CATEGORÍA'
   const headlineText = data.headline.trim() || 'Escribe aquí el titular de la noticia.'
 
   const pos = imagePosition ?? { x: 50, y: 50 }
+  const fg = foreground ?? { zoom: 1, x: 0, y: 0 }
+  const rootRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
+  const fgRef = useRef<HTMLImageElement>(null)
   const dragRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null)
   const [dragging, setDragging] = useState(false)
-  const draggable = Boolean(onPositionChange && data.imageUrl)
+  // En modo Redimensionar la imagen se muestra completa (contain), así que no se arrastra.
+  const draggable = Boolean(onPositionChange && data.imageUrl && !resizeMode)
+
+  // ---- Primer plano (modo Redimensionar): arrastrar + ampliar ----
+  const fgDragRef = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null)
+  const [fgDragging, setFgDragging] = useState(false)
+  // Valores actuales para el listener de rueda (evita closure obsoleto).
+  const fgValsRef = useRef(fg)
+  fgValsRef.current = fg
+
+  const onFgPointerDown = (e: ReactPointerEvent<HTMLImageElement>) => {
+    if (!onForegroundChange) return
+    e.currentTarget.setPointerCapture(e.pointerId)
+    fgDragRef.current = { x: e.clientX, y: e.clientY, tx: fg.x, ty: fg.y }
+    setFgDragging(true)
+  }
+  const onFgPointerMove = (e: ReactPointerEvent<HTMLImageElement>) => {
+    const d = fgDragRef.current
+    const root = rootRef.current
+    if (!d || !root || !onForegroundChange) return
+    const rect = root.getBoundingClientRect()
+    const dx = ((e.clientX - d.x) / rect.width) * 100
+    const dy = ((e.clientY - d.y) / rect.height) * 100
+    onForegroundChange({
+      zoom: fg.zoom,
+      x: clamp(d.tx + dx, -200, 200),
+      y: clamp(d.ty + dy, -200, 200),
+    })
+  }
+  const onFgPointerUp = (e: ReactPointerEvent<HTMLImageElement>) => {
+    fgDragRef.current = null
+    setFgDragging(false)
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      /* noop */
+    }
+  }
+
+  // Rueda del mouse para ampliar (listener nativo no-pasivo para poder preventDefault).
+  useEffect(() => {
+    const el = fgRef.current
+    if (!el || !resizeMode || !onForegroundChange) return
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault()
+      const cur = fgValsRef.current
+      const zoom = clamp(cur.zoom * Math.exp(-e.deltaY * 0.0015), ZOOM_MIN, ZOOM_MAX)
+      onForegroundChange({ ...cur, zoom })
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [resizeMode, onForegroundChange])
 
   const onPointerDown = (e: ReactPointerEvent<HTMLImageElement>) => {
     if (!draggable) return
@@ -78,30 +147,79 @@ export default function NewsFrameTemplate({
   }
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#000' }}>
-      {/* 1. Fotografía principal (arrastrable) */}
+    <div
+      ref={rootRef}
+      style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', background: '#000' }}
+    >
+      {/* 1. Fotografía principal */}
       {data.imageUrl ? (
-        <img
-          ref={imgRef}
-          src={data.imageUrl}
-          alt=""
-          draggable={false}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerCancel={endDrag}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: `${pos.x}% ${pos.y}%`,
-            cursor: draggable ? (dragging ? 'grabbing' : 'grab') : 'default',
-            touchAction: 'none',
-            userSelect: 'none',
-          }}
-        />
+        resizeMode ? (
+          // Modo Redimensionar: fondo desenfocado (cover) + imagen nítida completa (contain).
+          <>
+            <img
+              src={data.imageUrl}
+              alt=""
+              aria-hidden
+              draggable={false}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                objectPosition: `${pos.x}% ${pos.y}%`,
+                filter: 'blur(38px)',
+                // Escalamos para que el desenfoque no deje bordes transparentes.
+                transform: 'scale(1.18)',
+                pointerEvents: 'none',
+              }}
+            />
+            <img
+              ref={fgRef}
+              src={data.imageUrl}
+              alt=""
+              draggable={false}
+              onPointerDown={onFgPointerDown}
+              onPointerMove={onFgPointerMove}
+              onPointerUp={onFgPointerUp}
+              onPointerCancel={onFgPointerUp}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                transform: `translate(${fg.x}%, ${fg.y}%) scale(${fg.zoom})`,
+                transformOrigin: 'center',
+                cursor: onForegroundChange ? (fgDragging ? 'grabbing' : 'grab') : 'default',
+                touchAction: 'none',
+                userSelect: 'none',
+              }}
+            />
+          </>
+        ) : (
+          <img
+            ref={imgRef}
+            src={data.imageUrl}
+            alt=""
+            draggable={false}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={endDrag}
+            onPointerCancel={endDrag}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: `${pos.x}% ${pos.y}%`,
+              cursor: draggable ? (dragging ? 'grabbing' : 'grab') : 'default',
+              touchAction: 'none',
+              userSelect: 'none',
+            }}
+          />
+        )
       ) : (
         <div
           style={{

@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import type { ForegroundTransform } from '../types'
 
 export interface ImagePosition {
   /** object-position horizontal (0–100 %). */
@@ -6,6 +7,8 @@ export interface ImagePosition {
   /** object-position vertical (0–100 %). */
   y: number
 }
+
+const DEFAULT_TRANSFORM: ForegroundTransform = { zoom: 1, x: 0, y: 0 }
 
 interface GeneratorContextValue {
   category: string
@@ -18,6 +21,12 @@ interface GeneratorContextValue {
   /** Posición del encuadre, INDEPENDIENTE por plantilla (`templateId`). */
   getPosition: (templateId: string) => ImagePosition
   setPosition: (templateId: string, pos: ImagePosition) => void
+  /** Modo "Redimensionar" (fondo desenfocado + imagen nítida), por plantilla. */
+  getResizeMode: (templateId: string) => boolean
+  setResizeMode: (templateId: string, value: boolean) => void
+  /** Zoom + desplazamiento del primer plano (modo Redimensionar), por plantilla. */
+  getTransform: (templateId: string) => ForegroundTransform
+  setTransform: (templateId: string, t: ForegroundTransform) => void
 }
 
 const DEFAULT_POSITION: ImagePosition = { x: 50, y: 50 }
@@ -32,6 +41,8 @@ interface PersistedText {
   category?: string
   headline?: string
   positions?: Positions
+  resizeModes?: Record<string, boolean>
+  transforms?: Record<string, ForegroundTransform>
 }
 
 function loadText(): PersistedText {
@@ -57,18 +68,27 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
   const [category, setCategory] = useState(initialText.category ?? 'Última hora')
   const [headline, setHeadline] = useState(initialText.headline ?? '')
   const [positions, setPositions] = useState<Positions>(initialText.positions ?? {})
+  const [resizeModes, setResizeModes] = useState<Record<string, boolean>>(
+    initialText.resizeModes ?? {},
+  )
+  const [transforms, setTransforms] = useState<Record<string, ForegroundTransform>>(
+    initialText.transforms ?? {},
+  )
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(
     () => localStorage.getItem(IMAGE_KEY),
   )
 
-  // Persistir textos + posiciones (payload pequeño).
+  // Persistir textos + posiciones + modos + transformaciones (payload pequeño).
   useEffect(() => {
     try {
-      localStorage.setItem(TEXT_KEY, JSON.stringify({ category, headline, positions }))
+      localStorage.setItem(
+        TEXT_KEY,
+        JSON.stringify({ category, headline, positions, resizeModes, transforms }),
+      )
     } catch {
       /* cuota llena: se mantiene en memoria */
     }
-  }, [category, headline, positions])
+  }, [category, headline, positions, resizeModes, transforms])
 
   // Persistir la imagen por separado (solo cuando cambia).
   useEffect(() => {
@@ -99,6 +119,24 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
     setPositions((prev) => ({ ...prev, [templateId]: pos }))
   }, [])
 
+  const getResizeMode = useCallback(
+    (templateId: string) => resizeModes[templateId] ?? false,
+    [resizeModes],
+  )
+
+  const setResizeMode = useCallback((templateId: string, val: boolean) => {
+    setResizeModes((prev) => ({ ...prev, [templateId]: val }))
+  }, [])
+
+  const getTransform = useCallback(
+    (templateId: string) => transforms[templateId] ?? DEFAULT_TRANSFORM,
+    [transforms],
+  )
+
+  const setTransform = useCallback((templateId: string, t: ForegroundTransform) => {
+    setTransforms((prev) => ({ ...prev, [templateId]: t }))
+  }, [])
+
   const value: GeneratorContextValue = {
     category,
     headline,
@@ -108,6 +146,10 @@ export function GeneratorProvider({ children }: { children: ReactNode }) {
     setImageFile,
     getPosition,
     setPosition,
+    getResizeMode,
+    setResizeMode,
+    getTransform,
+    setTransform,
   }
 
   return <GeneratorContext.Provider value={value}>{children}</GeneratorContext.Provider>

@@ -9,6 +9,11 @@ interface EditorFormProps {
   onExport: () => void
   isExporting: boolean
   exportError?: string | null
+  resizeMode: boolean
+  onToggleResize: () => void
+  zoom: number
+  onZoomChange: (zoom: number) => void
+  onResetForeground: () => void
 }
 
 /**
@@ -23,6 +28,11 @@ export default function EditorForm({
   onExport,
   isExporting,
   exportError,
+  resizeMode,
+  onToggleResize,
+  zoom,
+  onZoomChange,
+  onResetForeground,
 }: EditorFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -81,6 +91,57 @@ export default function EditorForm({
         >
           {data.imageUrl ? 'Cambiar imagen' : 'Subir imagen'}
         </button>
+
+        <button
+          type="button"
+          onClick={onToggleResize}
+          aria-pressed={resizeMode}
+          className={
+            'mt-3 flex w-full items-center justify-center gap-2 rounded-lg border px-4 py-3 font-medium transition ' +
+            (resizeMode
+              ? 'border-red-500 bg-red-600/20 text-white'
+              : 'border-slate-600 bg-slate-900/60 text-slate-200 hover:border-red-500 hover:text-white')
+          }
+        >
+          <span
+            className={
+              'inline-block h-2.5 w-2.5 rounded-full ' +
+              (resizeMode ? 'bg-red-500' : 'bg-slate-500')
+            }
+          />
+          Redimensionar
+        </button>
+        <p className="mt-2 text-xs text-slate-500">
+          Ajusta la imagen al formato con fondo desenfocado. Luego puedes ampliar, mover y
+          recortar la imagen del frente.
+        </p>
+
+        {resizeMode && data.imageUrl && (
+          <div className="mt-4 rounded-lg border border-slate-700 bg-slate-900/50 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-300">Zoom</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs tabular-nums text-slate-400">{zoom.toFixed(2)}×</span>
+                <button
+                  type="button"
+                  onClick={onResetForeground}
+                  className="text-xs text-slate-400 underline-offset-2 transition hover:text-white hover:underline"
+                >
+                  Restablecer
+                </button>
+              </div>
+            </div>
+            <input
+              type="range"
+              min={0.5}
+              max={5}
+              step={0.01}
+              value={zoom}
+              onChange={(e) => onZoomChange(Number(e.target.value))}
+              className="w-full accent-red-600"
+            />
+          </div>
+        )}
       </div>
 
       <div className="pt-2">

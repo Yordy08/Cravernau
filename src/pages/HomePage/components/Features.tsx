@@ -1,18 +1,25 @@
-import React from 'react'
 import styles from './features.module.css'
 
 const items = [
   {
-    title: 'Estructura clara',
-    description: 'Página principal con componentes reutilizables.',
+    title: 'Edición en tiempo real',
+    description:
+      'Cambia categoría, titular e imagen y ve el resultado al instante. Sin botón de actualizar.',
   },
   {
-    title: 'Routing incluido',
-    description: 'Ruta / y /home con fallback 404.',
+    title: 'Varios formatos',
+    description:
+      'Noticia 4:5 e Historia 9:16. La misma imagen se reencuadra a cada formato, con posición independiente.',
   },
   {
-    title: 'Estilos listos',
-    description: 'CSS modules y estilos globales.',
+    title: 'Exporta en alta calidad',
+    description:
+      'Descarga un PNG a resolución nativa (1080×1350 o 1080×1920), listo para publicar.',
+  },
+  {
+    title: 'Imagen movible',
+    description:
+      'Arrastra la foto en la vista previa para ajustar el encuadre. Se guarda localmente entre plantillas.',
   },
 ]
 
@@ -20,7 +27,7 @@ export default function Features() {
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <h2 className={styles.h2}>Dependencias y componentes</h2>
+        <h2 className={styles.h2}>¿Qué puedes hacer?</h2>
         <div className={styles.grid}>
           {items.map((it) => (
             <div key={it.title} className={styles.card}>
@@ -33,4 +40,3 @@ export default function Features() {
     </section>
   )
 }
-
