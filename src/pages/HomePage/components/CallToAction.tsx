@@ -1,4 +1,4 @@
-import React from 'react'
+import { Link } from 'react-router-dom'
 import styles from './callToAction.module.css'
 
 export default function CallToAction() {
@@ -7,15 +7,16 @@ export default function CallToAction() {
       <div className={styles.container}>
         <div className={styles.box}>
           <div>
-            <div className={styles.title}>Listo para correr</div>
+            <div className={styles.title}>¿Listo para publicar?</div>
             <div className={styles.desc}>
-              Ejecuta: <span className={styles.code}>npm run dev</span>
+              Arma tu primera pieza y descárgala lista para Instagram, Facebook o WhatsApp.
             </div>
           </div>
-          <a className={styles.link} href="/home">Abrir Home</a>
+          <Link className={styles.link} to="/generador/noticia">
+            Abrir generador
+          </Link>
         </div>
       </div>
     </section>
   )
 }
-

@@ -23,6 +23,17 @@ export interface ImagePosition {
   y: number
 }
 
+/**
+ * Transformación de la imagen en primer plano (modo Redimensionar):
+ * zoom (escala) y desplazamiento en % del contenedor. Permite ampliar,
+ * mover y recortar la imagen para ubicarla donde se desee.
+ */
+export interface ForegroundTransform {
+  zoom: number
+  x: number
+  y: number
+}
+
 /** Props que recibe el componente visual de cualquier plantilla. */
 export interface TemplateComponentProps {
   data: NewsTemplateData
@@ -30,6 +41,18 @@ export interface TemplateComponentProps {
   imagePosition?: ImagePosition
   /** Callback al arrastrar la foto para reposicionarla. */
   onPositionChange?: (pos: ImagePosition) => void
+  /**
+   * Modo "Redimensionar": muestra la imagen nítida en primer plano
+   * (object-fit: contain, ampliable/desplazable) sobre una copia desenfocada de
+   * la misma imagen como fondo, para adaptarla al formato sin deformar.
+   */
+  resizeMode?: boolean
+  /** Zoom + desplazamiento de la imagen en primer plano (modo Redimensionar). */
+  foreground?: ForegroundTransform
+  /** Callback al ampliar/desplazar la imagen en primer plano. */
+  onForegroundChange?: (t: ForegroundTransform) => void
+  /** Escala del titular (multiplicador del tamaño base). */
+  headlineScale?: number
 }
 
 export type TemplateComponent = ComponentType<TemplateComponentProps>

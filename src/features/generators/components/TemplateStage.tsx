@@ -1,6 +1,11 @@
 import { type RefObject } from 'react'
 import { useFitScale } from '../hooks/useFitScale'
-import type { ImagePosition, NewsTemplateData, TemplateDefinition } from '../types'
+import type {
+  ForegroundTransform,
+  ImagePosition,
+  NewsTemplateData,
+  TemplateDefinition,
+} from '../types'
 
 interface TemplateStageProps {
   definition: TemplateDefinition
@@ -9,6 +14,10 @@ interface TemplateStageProps {
   exportRef: RefObject<HTMLDivElement | null>
   imagePosition: ImagePosition
   onPositionChange: (pos: ImagePosition) => void
+  resizeMode: boolean
+  foreground: ForegroundTransform
+  onForegroundChange: (t: ForegroundTransform) => void
+  headlineScale: number
 }
 
 /**
@@ -23,6 +32,10 @@ export default function TemplateStage({
   exportRef,
   imagePosition,
   onPositionChange,
+  resizeMode,
+  foreground,
+  onForegroundChange,
+  headlineScale,
 }: TemplateStageProps) {
   const { size, Component } = definition
   const { containerRef, scale } = useFitScale(size)
@@ -54,6 +67,10 @@ export default function TemplateStage({
               data={data}
               imagePosition={imagePosition}
               onPositionChange={onPositionChange}
+              resizeMode={resizeMode}
+              foreground={foreground}
+              onForegroundChange={onForegroundChange}
+              headlineScale={headlineScale}
             />
           </div>
         </div>

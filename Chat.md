@@ -1,1 +1,17 @@
-todo esta bien pero,solo en la parte donde se pone el titulo en video 9:16 , de fondo esta texto o titular que al momento de poner un titular nuevo se ve la parte a tras y se hace ver que esta un texto montado sobre el otro, ya lo demas esta muy bien. 
+Crea una vista llamada "Video Horizontal" usando la plantilla "noticia" 
+ubicada en /assets, similar a la vista "Noticia". es la misma
+
+Características:
+1. El usuario puede cargar un video .
+2. El fondo por defecto debe ser negro.
+3. La plantilla "noticia" se aplica automáticamente sobre el video.
+4. Los textos editables deben estar en los bloques definidos:
+   - "Categoría" en la parte superior.
+   - "Titular" debajo de la categoría.
+5. El usuario puede modificar esos textos directamente, pero la posición 
+   y estilo visual se mantienen según la plantilla.
+
+7. El diseño debe mantener coherencia con las vistas "Historia", "Noticia" 
+   y "Video 9:16".
+
+8. Esta vista debe tener los mismos estilos y opociones que video 9:16

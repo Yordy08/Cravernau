@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { TemplateSize } from '../types'
 
+const MAX_PREVIEW_SCALE = 0.72
+
 /**
  * Calcula el factor de escala para mostrar una plantilla de tamaño nativo
  * (`size`) dentro de un contenedor responsivo, sin deformarla y sin recortarla.
@@ -20,8 +22,8 @@ export function useFitScale(size: TemplateSize) {
       const { width, height } = node.getBoundingClientRect()
       if (width === 0 || height === 0) return
       const next = Math.min(width / size.width, height / size.height)
-      // Nunca ampliamos por encima del tamaño nativo.
-      setScale(Math.min(next, 1))
+      // Dejamos aire alrededor del preview para que no consuma toda la pantalla.
+      setScale(Math.min(next, MAX_PREVIEW_SCALE))
     }
 
     update()

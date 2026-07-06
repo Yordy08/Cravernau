@@ -7,8 +7,8 @@
   align-items:center;
   justify-content:space-between;
   gap:14px;
-  background:rgba(99,102,241,.12);
-  border:1px solid rgba(99,102,241,.30);
+  background:rgba(217,4,41,.12);
+  border:1px solid rgba(217,4,41,.30);
 }
 @media (max-width: 700px){
   .box{flex-direction:column; align-items:flex-start;}
@@ -16,5 +16,5 @@
 .title{font-weight:900; font-size:18px; margin-bottom:4px;}
 .desc{color:rgba(232,238,252,.86);}
 .code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; background:rgba(255,255,255,.08); padding:2px 6px; border-radius:8px;}
-.link{text-decoration:none; color:white; font-weight:800; background:linear-gradient(90deg,#6366f1,#8b5cf6); padding:10px 12px; border-radius:12px;}
+.link{text-decoration:none; color:white; font-weight:800; background:linear-gradient(90deg,#d90429,#b3141f); padding:10px 12px; border-radius:12px; white-space:nowrap;}
 

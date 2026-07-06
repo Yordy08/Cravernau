@@ -4,9 +4,16 @@ import HomePage from './pages/HomePage/HomePage'
 import GeneradorNoticiaPage from './pages/GeneradorNoticia/GeneradorNoticiaPage'
 import GeneradorHistoriaPage from './pages/GeneradorHistoria/GeneradorHistoriaPage'
 import GeneradorVideoPage from './pages/GeneradorVideo/GeneradorVideoPage'
+import GeneradorVideoHorizontalPage from './pages/GeneradorVideoHorizontal/GeneradorVideoHorizontalPage'
 import { GeneratorProvider } from './features/generators/state/GeneratorProvider'
+import { AuthProvider, useAuth } from './features/auth/AuthProvider'
+import LoginPage from './pages/LoginPage/LoginPage'
 
-export default function App() {
+function AppRoutes() {
+  const { isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return <LoginPage />
+
   return (
     <GeneratorProvider>
       <Routes>
@@ -15,9 +22,18 @@ export default function App() {
         <Route path="/generador/noticia" element={<GeneradorNoticiaPage />} />
         <Route path="/generador/historia" element={<GeneradorHistoriaPage />} />
         <Route path="/generador/video" element={<GeneradorVideoPage />} />
+        <Route path="/generador/video-horizontal" element={<GeneradorVideoHorizontalPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </GeneratorProvider>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   )
 }
 

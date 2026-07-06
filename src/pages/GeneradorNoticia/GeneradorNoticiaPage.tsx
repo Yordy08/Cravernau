@@ -2,10 +2,12 @@ import { Link, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import GeneratorEditor from '../../features/generators/components/GeneratorEditor'
 import { plantillaNoticia45 } from '../../features/generators/templates/PlantillaNoticia45'
+import { useAuth } from '../../features/auth/AuthProvider'
 
 /** Barra de navegación compartida entre los módulos generadores. */
 export function GeneratorShell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation()
+  const { logout } = useAuth()
   const tab = (to: string, label: string) => {
     const active = pathname === to
     return (
@@ -28,11 +30,21 @@ export function GeneratorShell({ children }: { children: ReactNode }) {
             <h1 className="text-2xl font-bold text-white">Generador de plantillas</h1>
             <p className="text-sm text-slate-400">Burbuja Política</p>
           </div>
-          <nav className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/50 p-1">
-            {tab('/generador/noticia', 'Noticia 4:5')}
-            {tab('/generador/historia', 'Historia 9:16')}
-            {tab('/generador/video', 'Video 9:16')}
-          </nav>
+          <div className="flex flex-wrap items-center gap-3">
+            <nav className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/50 p-1">
+              {tab('/generador/noticia', 'Noticia 4:5')}
+              {tab('/generador/historia', 'Historia 9:16')}
+              {tab('/generador/video', 'Video 9:16')}
+              {tab('/generador/video-horizontal', 'Video Horizontal')}
+            </nav>
+            <button
+              type="button"
+              onClick={logout}
+              className="rounded-lg border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-red-500 hover:text-white"
+            >
+              Deslogueo
+            </button>
+          </div>
         </header>
         <main className="flex-1">{children}</main>
       </div>

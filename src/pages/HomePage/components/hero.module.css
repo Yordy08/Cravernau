@@ -9,9 +9,9 @@
   display:inline-block;
   padding:8px 12px;
   border-radius:999px;
-  background:rgba(99,102,241,.15);
-  border:1px solid rgba(99,102,241,.35);
-  color:#c7d2fe;
+  background:rgba(217,4,41,.15);
+  border:1px solid rgba(217,4,41,.40);
+  color:#ffd7dd;
   font-weight:600;
   letter-spacing:.2px;
 }
@@ -35,7 +35,7 @@
 .primary{
   text-decoration:none;
   color:white;
-  background:linear-gradient(90deg,#6366f1,#8b5cf6);
+  background:linear-gradient(90deg,#d90429,#b3141f);
   padding:11px 14px;
   border-radius:12px;
   font-weight:700;
