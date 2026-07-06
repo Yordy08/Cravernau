@@ -1,0 +1,1 @@
+todo esta bien pero,solo en la parte donde se pone el titulo en video 9:16 , de fondo esta texto o titular que al momento de poner un titular nuevo se ve la parte a tras y se hace ver que esta un texto montado sobre el otro, ya lo demas esta muy bien. 

@@ -31,6 +31,7 @@ export function GeneratorShell({ children }: { children: ReactNode }) {
           <nav className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/50 p-1">
             {tab('/generador/noticia', 'Noticia 4:5')}
             {tab('/generador/historia', 'Historia 9:16')}
+            {tab('/generador/video', 'Video 9:16')}
           </nav>
         </header>
         <main className="flex-1">{children}</main>

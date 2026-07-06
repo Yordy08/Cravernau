@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage/HomePage'
 import GeneradorNoticiaPage from './pages/GeneradorNoticia/GeneradorNoticiaPage'
 import GeneradorHistoriaPage from './pages/GeneradorHistoria/GeneradorHistoriaPage'
+import GeneradorVideoPage from './pages/GeneradorVideo/GeneradorVideoPage'
 import { GeneratorProvider } from './features/generators/state/GeneratorProvider'
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/generador/noticia" element={<GeneradorNoticiaPage />} />
         <Route path="/generador/historia" element={<GeneradorHistoriaPage />} />
+        <Route path="/generador/video" element={<GeneradorVideoPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </GeneratorProvider>
